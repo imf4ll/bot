@@ -1,10 +1,11 @@
 import discord
 from discord.ext import commands
 import os
-import dotenv
+from dotenv import load_dotenv, find_dotenv
 import asyncio
 
 load_dotenv(find_dotenv())
+
 user = os.getenv('user')
 password = os.getenv('password')
 host = os.getenv('host')
