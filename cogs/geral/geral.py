@@ -1,6 +1,7 @@
 import discord
 from discord.ext import commands
 import asyncio
+from dotenv import load_dotenv, find_dotenv
 
 
 class Geral(commands.Cog):
@@ -59,7 +60,7 @@ class Geral(commands.Cog):
 
     @commands.command(pass_context=True, aliases=['latencia'])
     async def ping(self, ctx):
-        if not await Geral.verify_channel(self, ctx.channel.id, [], ''): return
+        #if not await Geral.verify_channel(self, ctx.channel.id, [], ''): return
         latencia_variavel = self.bot.latency
         embed = discord.Embed(title='Latência atual', description=f'**{str(latencia_variavel)}ms** \n{ctx.author}', color=0xffff00)
         embed.set_thumbnail(url='https://cdn.pixabay.com/photo/2012/04/01/19/21/exclamation-mark-24144_960_720.png')

@@ -1,11 +1,32 @@
 import discord
 from discord.ext import commands
 import asyncio
+import os
+from dotenv import load_dotenv, find_dotenv
+import datetime
+from datetime import date
+
+load_dotenv(find_dotenv())
+user = os.getenv('user')
+password = os.getenv('password')
+host = os.getenv('host')
+
+from pymongo import MongoClient
+cluster = MongoClient(f'mongodb+srv://{user}:{password}{host}')
+db = cluster['codify']
+conta = db['conta']
 
 class Staff(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
+
+    async def criar_conta(self, mem_id):
+        if mem_id != 851618408965079070:
+            try:    
+                await conta.insert_one({"_id":mem_id, "reps":[], "warnings":[], 'xp':0, "level":0})
+            except:
+                pass
     #===================================================
     #                  COMANDOS STAFF                  =
     #===================================================
@@ -49,7 +70,7 @@ class Staff(commands.Cog):
             raise error 
 
     @commands.command()
-    @commands.has_permissions(ban_members=True) 
+    @commands.has_permissions(kick_members=True) 
     async def kick(self, ctx, member : discord.Member, *, reason=None):
         embed = discord.Embed(title='Usuario punido', description=f'**Nome:** {member} \n**Guilda:** {ctx.guild}  \n**Motivo:** {reason} \n**Punição:** Kick \n\n**Aplicado por:** \n{ctx.author}', color=0xff0000)
         embed.set_thumbnail(url='https://media.gazetadopovo.com.br/2019/05/29175756/briga-irmaos-martelo-juiz-660x372.jpg')
@@ -89,94 +110,102 @@ class Staff(commands.Cog):
             await ctx.channel.send(embed=embed)
             await warn_log.send(embed=embed)
 
-    '''
     @commands.command(pass_context=True)
     @commands.has_permissions(manage_messages=True)
-    async def warn(self, ctx, other: discord.Member, *, arg : str = None):
-        id = str(ctx.author.id)
-        criar_conta(id)
-        if arg == None:
-            arg = 'Causa não informada'
-        other_id = str(other.id)
+    async def warn(self, ctx, member: discord.Member = None, *, motivo : str = None):
+        id = member.id
+        await Staff.criar_conta(self, id)
 
-        if other_id not in logs:
-            criar_conta(other_id)
+        if member == None:
+            await ctx.send(embed=discord.Embed(description='Você precisa informar quem será avisado. Ex: .warn @jv mto lindo', color=0xff0000))
+        if motivo == None:
+            motivo = 'Motivo não definido'
 
-        logs[other_id]['warnings'].append(f'"{arg}" - autor: {ctx.author.name}')
-        logs[other_id]['count'] += 1
-        em = discord.Embed(title = f'{other.name} foi avisado', description = f'🛑 {other.mention} recebeu um **aviso** de {ctx.author.mention} 🛑\nMotivo: "{arg}".', color = 0xff0000)
+        data_pura = date.today()
+        data = data_pura.strftime('%D/%M/%Y')
+        hora_pura = datetime.datetime.now() - datetime.timedelta(hours=3)
+        hora = hora_pura.strftime('%H:%M')
+
+        novo_aviso = f'> Motivo: {motivo}\n> Aplicador: {ctx.author}\n> Data e hora: {str(data) + " | " + str(hora)}'
+        conta.find_one_and_update({'_id':id}, {'$push':{'warnings':novo_aviso}})
+
+        em = discord.Embed(title = f'{member.name} foi avisado', description = f'🛑 {member.mention} recebeu um **aviso** de {ctx.author.mention} 🛑\nMotivo: "{motivo}".', color = 0xff0000)
         em.set_thumbnail(url='https://i.pinimg.com/474x/6e/d2/3c/6ed23c7f96498fe1fb56022077a352a7.jpg')
         await ctx.channel.send(embed=em)
         warn_log = self.bot.get_channel(743492526542946424)
         await warn_log.send(embed=embed)
-        _save()
-        if other == None:
-            await ctx.send(embed=discord.Embed(description='Você precisa informar o usuário. Ex: f!warn @jv', color=0xff0000))
     @warn.error
-    async def warn_error(ctx, error):
+    async def warn_error(self, ctx, error):
         if isinstance(error, commands.errors.MissingPermissions):
             await ctx.send(embed=discord.Embed(description='Você não tem permissão para usar este comando', color=0xff0000))
-        else:
-            raise error
-
-
-    @commands.command(pass_context=True)
-    async def warnings(self, ctx, other : discord.Member):
-        other_id = str(other.id)
-        if other_id not in logs:
-            await ctx.send(embed=discord.Embed(description='Este usuário ainda não tem nenhum warn', color=0xff0000))
-        else:
-            if logs[other_id]['warnings'] == []:
-                await ctx.send(embed=discord.Embed(description='Este usuário ainda não tem nenhum warn', color=0xff0000))
-            else:
-                avisos_str = ''
-                await ctx.channel.send(embed = discord.Embed(title = f'Warnings de {other.name}: ', color = 0xFECD00))
-                tamanho_aval = len(logs[other_id]['warnings'])
-                i = 0
-                while i < tamanho_aval:
-                    avisos_str = avisos_str + '\n' + logs[other_id]['warnings'][i]
-                    i += 1
-                await ctx.channel.send(embed = discord.Embed(description = avisos_str, color = 0x5e11ab))
-                _save()
-    @warnings.error
-    async def warnings_error(ctx, error):
-        if isinstance(error, commands.MissingRequiredArgument):
-            await ctx.send(embed=discord.Embed(description='Você precisa informar o usuário. Ex: ms!warnings @jv', color=0xff0000))
         else:
             raise error
 
 
     @commands.command(pass_context=True)
     @commands.has_permissions(manage_messages=True)
-    async def remover(self, ctx, arg, other: discord.Member, arg1 : int):
-        other_id = str(other.id)
-        if other_id not in logs:
+    async def warnings(self, ctx, member : discord.Member = None):
+        member_id = member.id 
+        if member == None:
+            await ctx.send(embed=discord.Embed(description='Você precisa informar um usuário. Ex: .warnings @jv mto lindo', color=0xff0000))
+
+        try:
+            warns = conta.find_one({'_id':member_id})['warnings']
+            msg = ''
+            for i in warns:
+                msg += f'{i}\n\n'
+            await ctx.send(embed=discord.Embed(title=f'warnings de {member.name}', description=msg, color=0x1CFEFE))
+        except:
+            await ctx.send(embed=discord.Embed(description='Este usuário não possui nenhum aviso', color=0xff0000))   
+
+
+        '''
             await ctx.send(embed=discord.Embed(description='Este usuário ainda não tem nenhum warn', color=0xff0000))
         else:
-            if arg == 'warn' and arg1 > 0:
-                num = int(arg1) - 1
-                aviso = logs[other_id]["warnings"][num].replace('"', '')
-                warn_log = self.bot.get_channel(743492526542946424)
-                await ctx.channel.send(embed = discord.Embed(title = f'O aviso "{aviso}" foi removido', color = 0xFECD00))
-                await warn_log.send(embed = discord.Embed(title = f'O aviso "{aviso}" foi removido', color = 0xFECD00))
-                del(logs[other_id]['warnings'][num])
-                logs[other_id]['count'] -= 1
+            if logs[member_id]['warnings'] == []:
+                await ctx.send(embed=discord.Embed(description='Este usuário ainda não tem nenhum warn', color=0xff0000))
             else:
-                await ctx.channel.send(embed = discord.Embed(title='Você precisa informar o que quer remover corretamente.', description='Ex: as!remover warn @jv 1', color = 0xff0000))
-            _save()
-    @remover.error
-    async def remover_error(self, ctx, error):
-        if isinstance(error, commands.MissingRequiredArgument):
-            await ctx.channel.send(embed = discord.Embed(title='Você precisa informar o que quer remover corretamente.', description='Ex: as!remover warn @jv 1', color = 0xff0000))
-        else:
-            raise error
-    @remover.error
-    async def remover_error2(self, ctx, error):
+                avisos_str = ''
+                await ctx.channel.send(embed = discord.Embed(title = f'Warnings de {member.name}: ', color = 0xFECD00))
+                tamanho_aval = len(logs[member_id]['warnings'])
+                i = 0
+                while i < tamanho_aval:
+                    avisos_str = avisos_str + '\n' + logs[member_id]['warnings'][i]
+                    i += 1
+                await ctx.channel.send(embed = discord.Embed(description = avisos_str, color = 0x5e11ab))
+        '''
+    @warnings.error
+    async def warnings_error(self, ctx, error):
         if isinstance(error, commands.errors.MissingPermissions):
             await ctx.send(embed=discord.Embed(description='Você não tem permissão para usar este comando', color=0xff0000))
         else:
             raise error
-    '''
+
+
+    @commands.command(pass_context=True)
+    @commands.has_permissions(manage_messages=True)
+    async def unwarn(self, ctx, member: discord.Member, arg1 : int):
+        member_id = member.id 
+        if member == None:
+            await ctx.send(embed=discord.Embed(description='Você precisa informar um usuário. Ex: .unwarn @jv 1', color=0xff0000))
+        if arg1 == None:
+            await ctx.send(embed=discord.Embed(description='Você precisa informar o número do aviso que deseja remover. Ex: .unwarn @jv 1', color=0xff0000))
+        else:
+            try:
+                warns = conta.find_one({'_id':member_id})['warnings']
+                warns.pop(int(arg1) - 1)
+                
+                conta.find_one_and_update({'_id':member_id}, {'$set':{'warnings':warns}})
+                await ctx.send(embed=discord.Embed(description='Aviso removido!', color=0x1CFEFE))
+            except:
+                await ctx.send(embed=discord.Embed(description='Este usuário não possui nenhum aviso', color=0xff0000))   
+
+    @unwarn.error
+    async def unwarn_error(self, ctx, error):
+        if isinstance(error, commands.errors.MissingPermissions):
+            await ctx.send(embed=discord.Embed(description='Você não tem permissão para usar este comando', color=0xff0000))
+        else:
+            raise error
 
     @commands.command(pass_context=True, aliases=['clear'])
     @commands.has_permissions(manage_messages=True)                                                                            
