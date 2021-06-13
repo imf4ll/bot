@@ -159,21 +159,6 @@ class Staff(commands.Cog):
             await ctx.send(embed=discord.Embed(description='Este usuário não possui nenhum aviso', color=0xff0000))   
 
 
-        '''
-            await ctx.send(embed=discord.Embed(description='Este usuário ainda não tem nenhum warn', color=0xff0000))
-        else:
-            if logs[member_id]['warnings'] == []:
-                await ctx.send(embed=discord.Embed(description='Este usuário ainda não tem nenhum warn', color=0xff0000))
-            else:
-                avisos_str = ''
-                await ctx.channel.send(embed = discord.Embed(title = f'Warnings de {member.name}: ', color = 0xFECD00))
-                tamanho_aval = len(logs[member_id]['warnings'])
-                i = 0
-                while i < tamanho_aval:
-                    avisos_str = avisos_str + '\n' + logs[member_id]['warnings'][i]
-                    i += 1
-                await ctx.channel.send(embed = discord.Embed(description = avisos_str, color = 0x5e11ab))
-        '''
     @warnings.error
     async def warnings_error(self, ctx, error):
         if isinstance(error, commands.errors.MissingPermissions):
