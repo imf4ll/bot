@@ -1,28 +1,19 @@
 import discord
 from discord.ext import commands
 import os
+import dotenv
 import asyncio
-from dotenv import load_dotenv, find_dotenv
-import requests as req
-import datetime
 
 load_dotenv(find_dotenv())
-user = os.getenv('user')
-password = os.getenv('password')
-host = os.getenv('host')
 
 from pymongo import MongoClient
-cluster = MongoClient(f'mongodb+srv://{user}:{password}{host}')
-#cluster = MongoClient('mongodb+srv://jv:1234@cluster0.cprce.mongodb.net/discord?retryWrites=true&w=majority')
-db = cluster['discord']
-banco = db['banco']
+cluster = MongoClient(f'')
+db = cluster['codify']
 conta = db['conta']
-server = db['server']
-membros = db['membros']
 
 intents = discord.Intents.all()
 intents.members = True
-bot = commands.Bot(command_prefix=[os.getenv('prefixo1'),os.getenv('prefixo2')], case_insensitive=True, intents=intents)
+bot = commands.Bot(command_prefix='.', case_insensitive=True, intents=intents)
 bot.remove_command('help')
 
 async def verify_channel(id, channels : None, msg: None):
@@ -33,24 +24,6 @@ async def verify_channel(id, channels : None, msg: None):
         await bot.get_channel(id).send(msg)
         return False
     return True
-
-def valor_acoes(empresaa):
-    '''
-    empresa = stockquotes.Stock(empresaa)
-    empresa = empresa.current_price
-    empresa = int(empresa)
-    '''
-    url = f"https://yahoo-finance-low-latency.p.rapidapi.com/v11/finance/quoteSummary/{empresaa}"
-    querystring = {"modules":"price"}
-
-    headers = {
-        'x-rapidapi-key': "b8ca806180msh9819c3532b69915p109b67jsn604f85fa74f8",
-        'x-rapidapi-host': "yahoo-finance-low-latency.p.rapidapi.com"
-        }
-    empresa = req.request("GET", url, headers=headers, params=querystring)
-    empresa = empresa.json()['quoteSummary']['result'][0]['price']['regularMarketPrice']['raw'] * 10
-    return int(empresa)
-
 
 def criar_conta(mem_id):
     if mem_id != 830574674706432010:
@@ -68,14 +41,6 @@ def criar_conta(mem_id):
             pass
 
 
-async def add_fisrt_command_bonus(mem_id):
-    try:
-        frst_cmd = conta.find_one({'_id':mem_id})['firststockcommand']
-    except:
-        conta.find_one_and_update({'_id':mem_id}, {'$set':{'firststockcommand':'True'}})
-
-
-
 @bot.event
 async def on_ready():
 
@@ -83,8 +48,6 @@ async def on_ready():
     print('     BOT ONLINE   ')
     print('@================@')
 
-    dlz = bot.get_channel(816164215932715028)
-    #await dlz.send('<@401549060487774208> dlz seu delicia, usa esses comandos aqui:\nf!setup1\nf!setup2\nf!setup3\nf!setup4\nf!setup5')
     for i in os.listdir('./cogs'):
         for e in os.listdir(f'./cogs/{i}'):
             if str(e).startswith('__py'):
@@ -95,52 +58,12 @@ async def on_ready():
 
 
     while True:
-        await bot.change_presence(status=discord.Status.online, activity=discord.Game(name="Feito por jv#2121 | Beta 1.1.22", type=3))
-        hr1 = datetime.datetime.now()
-        hr = hr1.strftime("%H%M")
-        hr_precisa = hr1.strftime("%H%M%S")
-        if str(hr) == '1402' or str(hr) == '1404' or str(hr) == '2202' or str(hr) == '2204':
-            print('falei entrei')
-            canal = bot.get_channel(827689497806372904)
-            voice = await canal.connect() 
-            voice.play(discord.FFmpegPCMAudio(f'inicio_mineracao.mp3'), after=lambda e: a)
-            voice.source = discord.PCMVolumeTransformer(voice.source)
-            voice.source.volume = 1.0
-            await asyncio.sleep(35)                #tempo do audio
-            await voice.disconnect()
-            await asyncio.sleep(61)
-        elif str(hr) == '1559' or str(hr) == '2359':
-            print('falei sai')
-            canal = bot.get_channel(827689497806372904)
-            try:
-                voice = await canal.connect() 
-                voice.play(discord.FFmpegPCMAudio(f'fim_mineracao.mp3'), after=lambda e: a)
-                voice.source = discord.PCMVolumeTransformer(voice.source)
-                voice.source.volume = 1.0
-                await asyncio.sleep(9)                #tempo do audio
-                await voice.disconnect()
-                members = canal.members
-                for mem in members:
-                    await mem.edit(voice_channel=None)
-                await asyncio.sleep(61)
-            except:
-                members = canal.members
-                for mem in members:
-                    await mem.edit(voice_channel=None)
-                await asyncio.sleep(61)
+        await bot.change_presence(status=discord.Status.online, activity=discord.Game(name="Codify Community", type=3))
+        await asyncio.sleep(30)
+        await bot.change_presence(status=discord.Status.online, activity=discord.Game(name=".help | discord.gg/codify", type=3))
+        await asyncio.sleep(30)
+        await bot.change_presence(status=discord.Status.online, activity=discord.Game(name="Beta 0.0.1", type=3))
 
-        dia = datetime.date.today()
-        if int(dia.day) == 1 and str(hr_precisa) == '030100':
-            for i in conta.find({}):
-                #só irá resetar os logins das pessoas que já possuem mais de 1 login, para consumir menos recursos
-                if i['logins'] != 0:
-                    conta.find_one_and_update({'_id':i['_id']}, {'$set':{'logins':0}})
-                    await asyncio.sleep(1)
-
-        server.find_one_and_update({'_id':0}, {'$set':{'ultimo_ping':hr1}})
-        await asyncio.sleep(5)
-
-        
 
 def _reload():
     for i in os.listdir('./cogs'):
