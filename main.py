@@ -5,41 +5,19 @@ import dotenv
 import asyncio
 
 load_dotenv(find_dotenv())
+user = os.getenv('user')
+password = os.getenv('password')
+host = os.getenv('host')
 
 from pymongo import MongoClient
-cluster = MongoClient(f'')
+cluster = MongoClient(f'mongodb+srv://{user}:{password}{host}')
 db = cluster['codify']
 conta = db['conta']
 
 intents = discord.Intents.all()
 intents.members = True
-bot = commands.Bot(command_prefix='.', case_insensitive=True, intents=intents)
+bot = commands.Bot(command_prefix=os.getenv('prefix'), case_insensitive=True, intents=intents)
 bot.remove_command('help')
-
-async def verify_channel(id, channels : None, msg: None):
-    if id == 733851707800289340:
-        await bot.get_channel(id).send('**Não é permitido o uso de comandos no chat <#733851707800289340>**')
-        return False
-    if id not in channels and len(channels) > 0:
-        await bot.get_channel(id).send(msg)
-        return False
-    return True
-
-def criar_conta(mem_id):
-    if mem_id != 830574674706432010:
-        try:
-            banco.insert_one({"_id":mem_id, "flercoins":0, "flerpoints":0})
-        except:
-            pass
-        try:    
-            conta.insert_one({"_id":mem_id, "descricao":"Use f!descricao para alterar a sua descrição", "warnings":[], 'xp':0, "level":0, "acoes":[],"investido":0, "voice":{"t_entrou":0, "t_saiu":0}, "logins":0, "ultimoslotmachine":1101, "bonus":"False", 'ultimologin':1101, "totalinvites":0,"invites":0})
-        except:
-            pass
-        try:
-            server.insert_one({"_id":0, "bump":"False", "ids":[]})
-        except:
-            pass
-
 
 @bot.event
 async def on_ready():

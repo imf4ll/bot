@@ -25,10 +25,10 @@ class Staff(commands.Cog):
             elif 'd' in temp:
                 temp = int(temp.lower().replace('d', '')) * 60 * 60 * 24
 
-            muteRole = discord.utils.get(ctx.guild.roles,name="Muted")
+            muteRole = discord.utils.get(ctx.guild.roles,name="mutado")
             await member.add_roles(muteRole)
 
-            warn_log = self.bot.get_channel(828481686512599070)
+            warn_log = self.bot.get_channel(743492526542946424)
             
             embed=discord.Embed(title="Usuário Mutado!", description="**{0}** foi mutado por **{1}**!".format(member, ctx.message.author), color=0xff0000)
             await ctx.send(embed=embed)
@@ -40,7 +40,6 @@ class Staff(commands.Cog):
             embed=discord.Embed(title="Usuário Desmutado!", description="O tempo de mute de **{0}** acabou!".format(member), color=0xff0000)
             await ctx.send(embed=embed)
             await warn_log.send(embed=embed)
-
     @mute.error
     async def mute_error(ctx, error):
         if isinstance(error, commands.errors.CommandInvokeError):
@@ -55,7 +54,7 @@ class Staff(commands.Cog):
         embed = discord.Embed(title='Usuario punido', description=f'**Nome:** {member} \n**Guilda:** {ctx.guild}  \n**Motivo:** {reason} \n**Punição:** Kick \n\n**Aplicado por:** \n{ctx.author}', color=0xff0000)
         embed.set_thumbnail(url='https://media.gazetadopovo.com.br/2019/05/29175756/briga-irmaos-martelo-juiz-660x372.jpg')
         try:
-            warn_log = self.bot.get_channel(828481686512599070) 
+            warn_log = self.bot.get_channel(743492526542946424) 
             await member.kick(reason=reason)
             await ctx.channel.send(embed=embed)
             try:
@@ -76,7 +75,7 @@ class Staff(commands.Cog):
         embed = discord.Embed(title='Usuario punido', description=f'**Nome:** {member} \n**Guilda:** {ctx.guild} \n**Motivo:** {reason} \n**Punição:** Ban \n\n**Aplicado por:** \n{ctx.author}', color=0xff0000)
         embed.set_thumbnail(url='https://media.gazetadopovo.com.br/2019/05/29175756/briga-irmaos-martelo-juiz-660x372.jpg')
         try:
-            warn_log = self.bot.get_channel(828481686512599070)
+            warn_log = self.bot.get_channel(743492526542946424)
             await member.ban(reason=reason)
             await ctx.channel.send(embed=embed)
             try:
@@ -108,7 +107,7 @@ class Staff(commands.Cog):
         em = discord.Embed(title = f'{other.name} foi avisado', description = f'🛑 {other.mention} recebeu um **aviso** de {ctx.author.mention} 🛑\nMotivo: "{arg}".', color = 0xff0000)
         em.set_thumbnail(url='https://i.pinimg.com/474x/6e/d2/3c/6ed23c7f96498fe1fb56022077a352a7.jpg')
         await ctx.channel.send(embed=em)
-        warn_log = self.bot.get_channel(828481686512599070)
+        warn_log = self.bot.get_channel(743492526542946424)
         await warn_log.send(embed=embed)
         _save()
         if other == None:
@@ -157,7 +156,7 @@ class Staff(commands.Cog):
             if arg == 'warn' and arg1 > 0:
                 num = int(arg1) - 1
                 aviso = logs[other_id]["warnings"][num].replace('"', '')
-                warn_log = self.bot.get_channel(828481686512599070)
+                warn_log = self.bot.get_channel(743492526542946424)
                 await ctx.channel.send(embed = discord.Embed(title = f'O aviso "{aviso}" foi removido', color = 0xFECD00))
                 await warn_log.send(embed = discord.Embed(title = f'O aviso "{aviso}" foi removido', color = 0xFECD00))
                 del(logs[other_id]['warnings'][num])
