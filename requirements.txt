@@ -1,2 +1,4 @@
 discord.py
-asyncio
+pymongo
+dnspython
+python-dotenv
