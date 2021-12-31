@@ -166,7 +166,8 @@ class Crypto(commands.Cog):
                 await ctx.channel.send(F'{ctx.author.mention}, **a quantidade informada está incorreta. O valor não pode ser negativo ou nulo! Tente novamente com um valor correto!**')
     @comprar.error
     async def comprar_error(self): pass
-
+    
+    @commands.cooldown(1, 2, commands.BucketType.user)
     @commands.command()
     async def vender(self, ctx, code = None, quant : int = None, price : int = None):
         #registra o usuário
@@ -243,7 +244,8 @@ class Crypto(commands.Cog):
                         await ctx.send(F"{ctx.author.mention}, **você ainda não comprou cripto. Compre-a para depois poder vende-la**")
             else:
                 await ctx.channel.send(F'{ctx.author.mention}, **a quantidade informada está incorreta. O valor não pode ser negativo ou nulo! Tente novamente com um valor correto!**')
-
+    @vender.error
+    async def vender_error(self): pass
 
     @commands.command(aliases=['wlt', 'carteira'])
     async def wallet(self, ctx, member:discord.Member = None):
