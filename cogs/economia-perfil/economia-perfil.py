@@ -97,85 +97,6 @@ class Economiaperfil(commands.Cog):
             else:
                 await ctx.channel.send('**Como você vai trasnferir um valor negativo ou nulo?\nInforme um valor correto da próxima vez!**')
 
-    '''
-    @commands.command(pass_context=True, aliases=['profile'])
-    async def perfil(self, ctx, member : discord.Member = None):
-        id = ctx.message.author.id
-        await self.criar_conta(id)
-        if not await Economiaperfil.verify_channel(self, ctx.channel.id, [], ''): return
-
-        if member == None:
-            user_avatar = req.get(ctx.author.avatar_url)
-        else:
-            id = member.id
-            await self.criar_conta(id)
-            user_avatar = req.get(member.avatar_url)
-
-        url = user_avatar
-        avatar = Image.open(BytesIO(url.content))
-        avatar = avatar.resize((136, 136))
-
-        background = Image.open('img/perfil.png')
-
-        if member == None:
-            user_name = ctx.author.name.lower()
-            user_saldo = str(conta.find_one({'_id':id})['saldo'])
-            user_descricao = str(conta.find_one({'_id':id})['descricao'])
-            user_avatar = req.get(ctx.author.avatar_url)
-            user_flercoins = str(conta.find_one({'_id':id})['flercoins'])
-            user_xp = str(conta.find_one({'_id':id})['xp'])
-            if ctx.author.id == 401549060487774208:
-                coroa = Image.open('img/coroa.jpg')
-                coroa = coroa.resize((25,25))
-                background.paste(coroa, (265, 9))
-            elif ctx.author.id == 693639831443734538:
-                coroa = Image.open('img/dev.jpg')
-                coroa = coroa.resize((35,30))
-                background.paste(coroa, (255, 6))
-        else:
-            id = member.id
-            await self.criar_conta(id)
-            user_name = str(member.name).lower()
-            user_saldo = str(conta.find_one({'_id':id})['saldo'])
-            user_descricao = str(conta.find_one({'_id':id})['descricao'])
-            user_avatar = req.get(member.avatar_url)
-            user_flercoins = str(conta.find_one({'_id':id})['flercoins'])
-            user_xp = str(conta.find_one({'_id':id})['xp'])
-            if id == 401549060487774208:
-                coroa = Image.open('img/coroa.jpg')
-                coroa = coroa.resize((25,25))
-                background.paste(coroa, (265, 9))
-            elif id == 693639831443734538:
-                coroa = Image.open('img/dev.jpg')
-                coroa = coroa.resize((35,30))
-                background.paste(coroa, (255, 6))
-
-        fonte_maior = ImageFont.truetype('fonts/LEMONMILK-Regular.otf', 25)
-        fonte = ImageFont.truetype('fonts/LEMONMILK-Regular.otf', 18)
-        fonte_menor = ImageFont.truetype('fonts/LEMONMILK-Regular.otf', 15)
-
-        draw = ImageDraw.Draw(background)
-        background.paste(avatar, (0, 0))
-
-        if len(user_name) > 18:
-            arg = list(user_name)
-            lista = arg[0:18]
-            arg = ''
-            for i in lista:
-                arg += i
-            arg += '...'
-            user_name = arg
-
-        draw.text((200, 5), user_name.lower(), font=fonte, fill='white')
-        draw.text((200, 50), 'saldo: '+user_saldo, font=fonte, fill='white')
-        draw.text((420, 5), 'FlerCoins: ' + user_flercoins, font=fonte, fill='white')
-        draw.text((420, 50), 'Xp: ' + user_xp, font=fonte, fill='white')
-        draw.text((5,392), 'Descrição: ', font=fonte_menor, fill='white')
-        draw.text((5,435), user_descricao, font=fonte_menor, fill='white')
-        background.save('temp/perfil-user.png', format='PNG')
-        ft = discord.File(open('temp/perfil-user.png', 'rb'))
-        await ctx.channel.send(ctx.author.mention, file=ft)
-    '''
 
     @commands.command(pass_context=True, aliases=['desc', 'description'])
     async def descricao(self, ctx, *, arg = None):
@@ -224,6 +145,7 @@ class Economiaperfil(commands.Cog):
         saldo = conta.find_one({'_id':user.id})['saldo']
         embed = discord.Embed(title =f"PERFIL DE {user.name}:", color = 0xb586ef)
         embed.add_field(name = '📝 Nome', value = f'{user.mention}', inline = True)
+        embed.add_field(name = '📝 Descrição', value = f'{user.mention}', inline = True)
         embed.add_field(name = '<a:ff_fogo_padrao:809486155815845898> XP', value = f'` {xp} XP `', inline = True)
         embed.add_field(name = '💸 saldo', value = f'` {saldo} FP `', inline = True)
         embed.add_field(name = '⭐ Nível', value = f'`⠀⠀{nivel}⠀⠀`', inline = True)
