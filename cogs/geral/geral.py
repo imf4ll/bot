@@ -5,16 +5,6 @@ import asyncio
 class Geral(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-    '''
-    async def verify_channel(self, id, channels : None, msg: None):
-        if id == 743482860161466509:
-            await self.bot.get_channel(id).send('**Não é permitido o uso de comandos no chat <#743482860161466509>**')
-            return False
-        if id not in channels and len(channels) > 0:
-            await self.bot.get_channel(id).send(msg)
-            return False
-        return True
-    '''
 
     #===================================================
     #                      GERAL                       =
@@ -29,30 +19,6 @@ class Geral(commands.Cog):
         await ctx.channel.purge(limit=1)
         em = discord.Embed(description=arg, color=0xFECD00)
         await ctx.channel.send(embed=em)
-
-    @commands.command(pass_context=True)
-    async def embed_sem(self, ctx, *, arg):
-        await ctx.channel.purge(limit=1)
-        em = discord.Embed(description=arg, color=0xFECD00)
-        await ctx.channel.send(embed=em)
-
-    @commands.command(pass_context=True)
-    async def embed_url(self, ctx, url, *, arg):
-        await ctx.channel.purge(limit=1)
-        em = discord.Embed(description=arg, color=0xFECD00)
-        em.set_thumbnail(url=url)
-        await ctx.channel.send(embed=em)
-
-    @commands.command(aliases=['imagem', 'foto'])
-    async def img(self, ctx, arg):
-        em = discord.Embed()
-        em.set_image(url=arg)
-        await ctx.channel.send(embed=em)
-
-
-    @commands.command(aliases=['imagem_sem', 'foto_sem'])
-    async def img_sem(self, ctx, arg):
-        await ctx.channel.send(arg)
 
 
     @commands.command(pass_context=True, aliases=['latencia'])

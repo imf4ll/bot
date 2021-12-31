@@ -1,6 +1,5 @@
 import discord
 from discord.ext import commands
-from io import BytesIO
 import requests as req
 from random import randint
 import asyncio
@@ -9,7 +8,6 @@ from utils.mongoconnect import mongoConnect
 
 cluster = mongoConnect()
 db = cluster['discord']
-conta = db['conta']
 conta = db['conta']
 server = db['server']
 membros = db['membros']
