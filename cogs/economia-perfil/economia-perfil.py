@@ -4,18 +4,10 @@ from io import BytesIO
 import requests as req
 from random import randint
 import asyncio
-import os
-from dotenv import load_dotenv, find_dotenv
 from discord.ext.commands.core import cooldown
+from utils.mongoconnect import mongoConnect
 
-
-load_dotenv(find_dotenv())
-user = os.getenv('user')
-password = os.getenv('password')
-host = os.getenv('host')
-
-from pymongo import MongoClient
-cluster = MongoClient(f'mongodb+srv://{user}:{password}{host}')
+cluster = mongoConnect()
 db = cluster['discord']
 conta = db['conta']
 conta = db['conta']
