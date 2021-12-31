@@ -1,10 +1,16 @@
 import discord
 from discord.ext import commands
 import requests as req
-import os
-from dotenv import load_dotenv, find_dotenv
 import datetime
 import asyncio
+from utils.mongoconnect import mongoConnect
+
+cluster = mongoConnect()
+db = cluster['discord']
+conta = db['conta']
+conta = db['conta']
+server = db['server']
+membros = db['membros']
 
 def valor_acoes(code):
     if type(code) == str:
@@ -25,20 +31,6 @@ def valor_acoes(code):
                 "{:.2f}".format(float(i['priceChangePercent']))
                 ]
         return list_cryptos
-
-
-load_dotenv(find_dotenv())
-user = os.getenv('user')
-password = os.getenv('password')
-host = os.getenv('host')
-
-from pymongo import MongoClient
-cluster = MongoClient(f'mongodb+srv://{user}:{password}{host}')
-db = cluster['discord']
-conta = db['conta']
-conta = db['conta']
-server = db['server']
-membros = db['membros']
 
 cryptos = {'BTC':'BTCBRL', 'ETH':'ETHBRL', 'BNB':'BNBBRL', 'LTC':'LTCBRL', 'AXS':'AXSBRL', 'SOL':'SOLBRL', 'DOT':'DOTBRL', 'LINK':'LINKBRL', 'CAKE':'CAKEBRL'}
 cryptos_inverso = {'BTCBRL':'BTC', 'ETHBRL':'ETH', 'BNBBRL':'BNB', 'LTCBRL':'LTC', 'AXSBRL':'AXS', 'SOLBRL':'SOL', 'DOTBRL':'DOT', 'LINKBRL':'LINK', 'CAKEBRL':'CAKE'}
