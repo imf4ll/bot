@@ -133,7 +133,7 @@ class Staff(commands.Cog):
         em.set_thumbnail(url='https://i.pinimg.com/474x/6e/d2/3c/6ed23c7f96498fe1fb56022077a352a7.jpg')
         await ctx.channel.send(embed=em)
         warn_log = self.bot.get_channel(743492526542946424)
-        await warn_log.send(embed=embed)
+        await warn_log.send(embed=em)
     @warn.error
     async def warn_error(self, ctx, error):
         if isinstance(error, commands.errors.MissingPermissions):
@@ -145,18 +145,18 @@ class Staff(commands.Cog):
     @commands.command(pass_context=True)
     @commands.has_permissions(manage_messages=True)
     async def warnings(self, ctx, member : discord.Member = None):
-        member_id = member.id 
         if member == None:
             await ctx.send(embed=discord.Embed(description='Você precisa informar um usuário. Ex: .warnings @jv mto lindo', color=0xff0000))
-
-        try:
-            warns = conta.find_one({'_id':member_id})['warnings']
+            return
+        member_id = member.id 
+        warns = conta.find_one({'_id':member_id})['warnings']
+        if len(warns) == 0:
+            await ctx.send(embed=discord.Embed(description='Este usuário não possui nenhum aviso', color=0xff0000))  
+        else:
             msg = ''
             for i in warns:
                 msg += f'{i}\n\n'
-            await ctx.send(embed=discord.Embed(title=f'warnings de {member.name}', description=msg, color=0x1CFEFE))
-        except:
-            await ctx.send(embed=discord.Embed(description='Este usuário não possui nenhum aviso', color=0xff0000))   
+            await ctx.send(embed=discord.Embed(title=f'warnings de {member.name}', description=msg, color=0x1CFEFE)) 
 
 
     @warnings.error
