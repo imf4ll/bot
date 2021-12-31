@@ -1,16 +1,9 @@
 import discord
 from discord.ext import commands
 import asyncio
-import os
-from dotenv import load_dotenv, find_dotenv
+from utils.mongoconnect import mongoConnect
 
-load_dotenv(find_dotenv())
-user = os.getenv('user')
-password = os.getenv('password')
-host = os.getenv('host')
-
-from pymongo import MongoClient
-cluster = MongoClient(f'mongodb+srv://{user}:{password}{host}')
+cluster = mongoConnect()
 db = cluster['codify']
 conta = db['conta']
 logs = db['logs']
