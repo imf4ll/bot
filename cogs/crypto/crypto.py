@@ -1,8 +1,6 @@
 import discord
 from discord.ext import commands
 import requests as req
-import os
-from dotenv import load_dotenv, find_dotenv
 import datetime
 import asyncio
 from utils.mongoconnect import mongoConnect
