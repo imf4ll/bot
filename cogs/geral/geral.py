@@ -1,8 +1,6 @@
 import discord
 from discord.ext import commands
 import asyncio
-from dotenv import load_dotenv, find_dotenv
-
 
 class Geral(commands.Cog):
     def __init__(self, bot):
