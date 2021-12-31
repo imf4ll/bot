@@ -98,7 +98,7 @@ class Crypto(commands.Cog):
         embed.set_footer(text='⚠️ Atenção: Para a comprar e vender criptomoedas corretamente, utilize o código localizado após o nome da cripto.\n\n💡 Dica: Compre Criptos quando estiverem em baixa para vende-las quando estiverem em alta! Mas Cuidado! Nem sempre é assim.')
         await ctx.send(embed=embed)
 
-
+    @commands.cooldown(1, 2, commands.BucketType.user)
     @commands.command()
     async def comprar(self, ctx, code = None, quant = None, price = None):       
         #registra o usuário
@@ -164,7 +164,8 @@ class Crypto(commands.Cog):
                     await ctx.send(f'{ctx.author.mention}, O valor de compra que você inseriu é menor do que o atual ({valor}). Informe um valor igual ou um pouco maior para conseguir')
             else:
                 await ctx.channel.send(F'{ctx.author.mention}, **a quantidade informada está incorreta. O valor não pode ser negativo ou nulo! Tente novamente com um valor correto!**')
-
+    @comprar.error
+    async def comprar_error(self): pass
 
     @commands.command()
     async def vender(self, ctx, code = None, quant : int = None, price : int = None):
