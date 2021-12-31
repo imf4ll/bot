@@ -4,7 +4,7 @@ import requests as req
 import datetime
 import asyncio
 from utils.mongoconnect import mongoConnect
-from caching import cache
+from caching import Cache
 import time 
 
 cluster = mongoConnect()
@@ -13,7 +13,7 @@ conta = db['conta']
 conta = db['conta']
 server = db['server']
 membros = db['membros']
-exchange_cache = cache(1000 * 60 * 30, get_crypto_value)
+exchange_cache = Cache(1000 * 60 * 30, get_crypto_value)
 
 
 def get_crypto_values():
