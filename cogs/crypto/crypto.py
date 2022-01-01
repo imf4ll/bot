@@ -4,8 +4,6 @@ import requests as req
 import datetime
 import asyncio
 from utils.mongoconnect import mongoConnect
-from caching import Cache
-import time 
 
 cluster = mongoConnect()
 db = cluster['discord']
@@ -13,16 +11,6 @@ conta = db['conta']
 conta = db['conta']
 server = db['server']
 membros = db['membros']
-exchange_cache = Cache(1000 * 60 * 30, get_crypto_value)
-
-
-def get_crypto_values():
-    graficos = 'https://coinmarketcap.com/pt-br/currencies/bitcoin/ https://coinmarketcap.com/pt-br/currencies/ethereum/ https://coinmarketcap.com/pt-br/currencies/binance-coin/ https://coinmarketcap.com/pt-br/currencies/litecoin/ https://coinmarketcap.com/pt-br/currencies/axie-infinity/ https://coinmarketcap.com/pt-br/currencies/solana/ https://coinmarketcap.com/pt-br/currencies/polkadot-new/ https://coinmarketcap.com/pt-br/currencies/chainlink/ https://coinmarketcap.com/pt-br/currencies/pancakeswap/'.split()
-    emojis_logos = ['<:binancecoin:926324388725424138>', '<:ethereum:926324233523560478>', '<:binancecoin:926324388725424138>', '<:litecoin:926324504156852224>', '<:axye:926324690916618260>', '<:solano:926324887407194132>', '<:polkadot:926324993569226782>', '<:chainlink:926325188969246730>', '<:pancakeswap:926325842236305468>']
-    codes = []
-    for i in cryptos_inverso:codes.append(i)
-    crypto_json = valor_acoes(codes)
-    return crypto_json
 
 def valor_acoes(code):
     if type(code) == str:
@@ -85,11 +73,11 @@ class Crypto(commands.Cog):
 
         embed=discord.Embed(title='EXCHANGE・Invista em Cripto Agora!', description='Utilize o comando `.comprar` para Comprar e `.vender` para Vender.\nEx: `.comprar/vender <crypto> <quantidade> <preço>`.\n⠀', color=0xB588EC)  
         
-        # graficos = 'https://coinmarketcap.com/pt-br/currencies/bitcoin/ https://coinmarketcap.com/pt-br/currencies/ethereum/ https://coinmarketcap.com/pt-br/currencies/binance-coin/ https://coinmarketcap.com/pt-br/currencies/litecoin/ https://coinmarketcap.com/pt-br/currencies/axie-infinity/ https://coinmarketcap.com/pt-br/currencies/solana/ https://coinmarketcap.com/pt-br/currencies/polkadot-new/ https://coinmarketcap.com/pt-br/currencies/chainlink/ https://coinmarketcap.com/pt-br/currencies/pancakeswap/'.split()
-        # emojis_logos = ['<:binancecoin:926324388725424138>', '<:ethereum:926324233523560478>', '<:binancecoin:926324388725424138>', '<:litecoin:926324504156852224>', '<:axye:926324690916618260>', '<:solano:926324887407194132>', '<:polkadot:926324993569226782>', '<:chainlink:926325188969246730>', '<:pancakeswap:926325842236305468>']
-        # codes = []
-        # for i in cryptos_inverso:codes.append(i)
-        crypto_json = exchange_cache.get_value()
+        graficos = 'https://coinmarketcap.com/pt-br/currencies/bitcoin/ https://coinmarketcap.com/pt-br/currencies/ethereum/ https://coinmarketcap.com/pt-br/currencies/binance-coin/ https://coinmarketcap.com/pt-br/currencies/litecoin/ https://coinmarketcap.com/pt-br/currencies/axie-infinity/ https://coinmarketcap.com/pt-br/currencies/solana/ https://coinmarketcap.com/pt-br/currencies/polkadot-new/ https://coinmarketcap.com/pt-br/currencies/chainlink/ https://coinmarketcap.com/pt-br/currencies/pancakeswap/'.split()
+        emojis_logos = ['<:binancecoin:926324388725424138>', '<:ethereum:926324233523560478>', '<:binancecoin:926324388725424138>', '<:litecoin:926324504156852224>', '<:axye:926324690916618260>', '<:solano:926324887407194132>', '<:polkadot:926324993569226782>', '<:chainlink:926325188969246730>', '<:pancakeswap:926325842236305468>']
+        codes = []
+        for i in cryptos_inverso:codes.append(i)
+        crypto_json = valor_acoes(codes)
         counter = 0
         for i in cryptos:
             counter +=1
