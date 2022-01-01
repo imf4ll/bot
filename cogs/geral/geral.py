@@ -21,10 +21,10 @@ class Geral(commands.Cog):
         await ctx.channel.send(embed=em)
 
 
-    @commands.command(pass_context=True, aliases=['latencia'])
-    async def ping(self, ctx):
-        latencia_variavel = self.bot.latency
-        embed = discord.Embed(title='Latência atual', description=f'**{str(latencia_variavel)}ms** \n{ctx.author}', color=0xffff00)
+    @commands.command(pass_context = True, aliases = ['latencia'])
+     async def ping(self, ctx):
+        embed = discord.Embed(title = 'Latência', description = f'A latência atual é de **{round(self.bot.latency * 1000)}ms**', c  olor = 0xffff00)
+        embed.set_footer(text = ctx.author, icon_url = ctx.author.avatar_url)
         embed.set_thumbnail(url='https://cdn.pixabay.com/photo/2012/04/01/19/21/exclamation-mark-24144_960_720.png')
         await ctx.channel.send(embed=embed)
 
