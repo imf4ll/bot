@@ -13,7 +13,7 @@ conta = db['conta']
 conta = db['conta']
 server = db['server']
 membros = db['membros']
-exchange_cache = Cache(1000 * 60 * 30, get_crypto_value)
+exchange_cache = Cache(1000 * 60 * 30, get_crypto_values)
 
 
 def get_crypto_values():
