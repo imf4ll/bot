@@ -4,6 +4,8 @@ import requests as req
 import datetime
 import asyncio
 from utils.mongoconnect import mongoConnect
+from caching import Cache
+import time
 
 cluster = mongoConnect()
 db = cluster['discord']
@@ -11,6 +13,16 @@ conta = db['conta']
 conta = db['conta']
 server = db['server']
 membros = db['membros']
+exchange_cache = Cache(1000 * 60 * 30, get_crypto_values)
+
+
+def get_crypto_values():
+    graficos = 'https://coinmarketcap.com/pt-br/currencies/bitcoin/ https://coinmarketcap.com/pt-br/currencies/ethereum/ https://coinmarketcap.com/pt-br/currencies/binance-coin/ https://coinmarketcap.com/pt-br/currencies/litecoin/ https://coinmarketcap.com/pt-br/currencies/axie-infinity/ https://coinmarketcap.com/pt-br/currencies/solana/ https://coinmarketcap.com/pt-br/currencies/polkadot-new/ https://coinmarketcap.com/pt-br/currencies/chainlink/ https://coinmarketcap.com/pt-br/currencies/pancakeswap/'.split()
+    emojis_logos = ['<:binancecoin:926324388725424138>', '<:ethereum:926324233523560478>', '<:binancecoin:926324388725424138>', '<:litecoin:926324504156852224>', '<:axye:926324690916618260>', '<:solano:926324887407194132>', '<:polkadot:926324993569226782>', '<:chainlink:926325188969246730>', '<:pancakeswap:926325842236305468>']
+    codes = []
+    for i in cryptos_inverso:codes.append(i)
+    crypto_json = valor_acoes(codes)
+    return crypto_json
 
 def valor_acoes(code):
     if type(code) == str:
@@ -52,7 +64,7 @@ class Crypto(commands.Cog):
 
     async def criar_conta(self, mem_id):
         if mem_id != 851618408965079070:
-            try:    
+            try:
                 await conta.insert_one({"_id":mem_id, "saldo":0, "avaliacoes":[], "wallet":{}, "warnings":[], 'xp':0, "level":0, "descricao":"Use .descricao para alterar a sua descrição"})
             except:
                 pass
@@ -71,13 +83,13 @@ class Crypto(commands.Cog):
 
         saldo = conta.find_one({'_id':id})['saldo']
 
-        embed=discord.Embed(title='EXCHANGE・Invista em Cripto Agora!', description='Utilize o comando `.comprar` para Comprar e `.vender` para Vender.\nEx: `.comprar/vender <crypto> <quantidade> <preço>`.\n⠀', color=0xB588EC)  
-        
-        graficos = 'https://coinmarketcap.com/pt-br/currencies/bitcoin/ https://coinmarketcap.com/pt-br/currencies/ethereum/ https://coinmarketcap.com/pt-br/currencies/binance-coin/ https://coinmarketcap.com/pt-br/currencies/litecoin/ https://coinmarketcap.com/pt-br/currencies/axie-infinity/ https://coinmarketcap.com/pt-br/currencies/solana/ https://coinmarketcap.com/pt-br/currencies/polkadot-new/ https://coinmarketcap.com/pt-br/currencies/chainlink/ https://coinmarketcap.com/pt-br/currencies/pancakeswap/'.split()
-        emojis_logos = ['<:binancecoin:926324388725424138>', '<:ethereum:926324233523560478>', '<:binancecoin:926324388725424138>', '<:litecoin:926324504156852224>', '<:axye:926324690916618260>', '<:solano:926324887407194132>', '<:polkadot:926324993569226782>', '<:chainlink:926325188969246730>', '<:pancakeswap:926325842236305468>']
-        codes = []
-        for i in cryptos_inverso:codes.append(i)
-        crypto_json = valor_acoes(codes)
+        embed=discord.Embed(title='EXCHANGE・Invista em Cripto Agora!', description='Utilize o comando `.comprar` para Comprar e `.vender` para Vender.\nEx: `.comprar/vender <crypto> <quantidade> <preço>`.\n⠀', color=0xB588EC)
+
+        # graficos = 'https://coinmarketcap.com/pt-br/currencies/bitcoin/ https://coinmarketcap.com/pt-br/currencies/ethereum/ https://coinmarketcap.com/pt-br/currencies/binance-coin/ https://coinmarketcap.com/pt-br/currencies/litecoin/ https://coinmarketcap.com/pt-br/currencies/axie-infinity/ https://coinmarketcap.com/pt-br/currencies/solana/ https://coinmarketcap.com/pt-br/currencies/polkadot-new/ https://coinmarketcap.com/pt-br/currencies/chainlink/ https://coinmarketcap.com/pt-br/currencies/pancakeswap/'.split()
+        # emojis_logos = ['<:binancecoin:926324388725424138>', '<:ethereum:926324233523560478>', '<:binancecoin:926324388725424138>', '<:litecoin:926324504156852224>', '<:axye:926324690916618260>', '<:solano:926324887407194132>', '<:polkadot:926324993569226782>', '<:chainlink:926325188969246730>', '<:pancakeswap:926325842236305468>']
+        # codes = []
+        # for i in cryptos_inverso:codes.append(i)
+        crypto_json = exchange_cache.get_value()
         counter = 0
         for i in cryptos:
             counter +=1
@@ -86,13 +98,13 @@ class Crypto(commands.Cog):
             porcentagem = f"```diff\n+{porce}%```" if not '-' in porce else f"```diff\n{porce}%```"
 
             embed.add_field(name = f"{emojis_logos[counter - 1]} {str(cryptos_nome[i].capitalize())} ({i})", value = f"Price: `{valor}` R$・[Gráfico]({graficos[counter - 1]}){porcentagem}⠀", inline=True)
-        
+
         embed.set_footer(text='⚠️ Atenção: Para a comprar e vender criptomoedas corretamente, utilize o código localizado após o nome da cripto.\n\n💡 Dica: Compre Criptos quando estiverem em baixa para vende-las quando estiverem em alta! Mas Cuidado! Nem sempre é assim.')
         await ctx.send(embed=embed)
 
     @commands.cooldown(1, 2, commands.BucketType.user)
     @commands.command()
-    async def comprar(self, ctx, code = None, quant = None, price = None):       
+    async def comprar(self, ctx, code = None, quant = None, price = None):
         #registra o usuário
         id = ctx.author.id
         await self.criar_conta(id)
@@ -158,7 +170,7 @@ class Crypto(commands.Cog):
                 await ctx.channel.send(F'{ctx.author.mention}, **a quantidade informada está incorreta. O valor não pode ser negativo ou nulo! Tente novamente com um valor correto!**')
     @comprar.error
     async def comprar_error(self): pass
-    
+
     @commands.cooldown(1, 2, commands.BucketType.user)
     @commands.command()
     async def vender(self, ctx, code = None, quant : int = None, price : int = None):
@@ -230,7 +242,7 @@ class Crypto(commands.Cog):
                                 conta.find_one_and_update({"_id":id}, {"$inc":{'saldo':price * quant_inicial}})
                             else:
                                 await ctx.send(f'**{ctx.author.mention}, O valor de venda que você inseriu é maior do que o atual ({valor}). Informe um valor igual ou um pouco menor para conseguir efetivar a ordem de venda!**')
-                        else:   
+                        else:
                             await ctx.send(F"{ctx.author.mention}, **você não possui esta quantidade de criptos. Compre mais para depois poder vende-las**")
                     else:
                         await ctx.send(F"{ctx.author.mention}, **você ainda não comprou cripto. Compre-a para depois poder vende-la**")
@@ -253,7 +265,7 @@ class Crypto(commands.Cog):
         user_criptos = conta.find_one({'_id':id})['wallet']
         print(user_criptos)
         criptos_txt = ''
-        
+
         #percorre e monta a string
         for e in user_criptos:
             for i in user_criptos[e]:
