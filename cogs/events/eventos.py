@@ -11,9 +11,6 @@ from utils.mongoconnect import mongoConnect
 cluster = mongoConnect()
 db = cluster['discord']
 conta = db['conta']
-conta = db['conta']
-server = db['server']
-membros = db['membros']
 
 premio = []
 
@@ -24,7 +21,7 @@ class Eventos(commands.Cog):
     async def criar_conta(self, mem_id):
         if mem_id != 851618408965079070:
             try:    
-                conta.insert_one({"_id":mem_id, "saldo":0, "avaliacoes":[], "wallet":{}, "warnings":[], 'xp':0, "level":0, "descricao":"Use .descricao para alterar a sua descrição"})
+                conta.insert_one({"_id":mem_id, "saldo":0, "stars":[], "wallet":{}, "warnings":[], 'xp':0, "level":0, "descricao":"Use .descricao para alterar a sua descrição"})
             except:
                 pass
 

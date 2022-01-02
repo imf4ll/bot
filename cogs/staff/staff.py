@@ -16,7 +16,7 @@ class Staff(commands.Cog):
     async def criar_conta(self, mem_id):
         if mem_id != 851618408965079070:
             try:    
-                await conta.insert_one({"_id":mem_id, "saldo":0, "avaliacoes":[], "wallet":{}, "warnings":[], 'xp':0, "level":0, "descricao":"Use .descricao para alterar a sua descrição"})
+                await conta.insert_one({"_id":mem_id, "saldo":0, "stars":[], "wallet":{}, "warnings":[], 'xp':0, "level":0, "descricao":"Use .descricao para alterar a sua descrição"})
             except:
                 pass
     #===================================================

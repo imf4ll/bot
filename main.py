@@ -1,19 +1,11 @@
 import discord
 from discord.ext import commands
 import os
-from dotenv import load_dotenv, find_dotenv
+from dotenv import load_dotenv
 import asyncio
 
-load_dotenv(find_dotenv())
 
-user = os.getenv('user')
-password = os.getenv('password')
-host = os.getenv('host')
-
-from pymongo import MongoClient
-cluster = MongoClient(f'mongodb+srv://{user}:{password}{host}')
-db = cluster['codify']
-conta = db['conta']
+load_dotenv()
 
 intents = discord.Intents.all()
 intents.members = True
@@ -43,7 +35,7 @@ async def on_ready():
         await bot.change_presence(status=discord.Status.online, activity=discord.Game(name=".help | discord.gg/codify", type=3))
         await asyncio.sleep(30)
         await bot.change_presence(status=discord.Status.online, activity=discord.Game(name="Beta 0.0.1", type=3))
-
+        await asyncio.sleep(30)
 
 def _reload():
     for i in os.listdir('./cogs'):

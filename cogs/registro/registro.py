@@ -6,7 +6,6 @@ from utils.mongoconnect import mongoConnect
 cluster = mongoConnect()
 db = cluster['codify']
 conta = db['conta']
-logs = db['logs']
 
 class Registro(commands.Cog):
     def __init__(self, bot):

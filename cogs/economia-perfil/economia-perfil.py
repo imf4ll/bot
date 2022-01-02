@@ -43,7 +43,7 @@ class Economiaperfil(commands.Cog):
     async def criar_conta(self, mem_id):
         if mem_id != 851618408965079070:
             try:    
-                await conta.insert_one({"_id":mem_id, "saldo":0, "avaliacoes":[], "wallet":{}, "warnings":[], 'xp':0, "level":0, "descricao":"Use .descricao para alterar a sua descrição"})
+                await conta.insert_one({"_id":mem_id, "saldo":0, "stars":[], "wallet":{}, "warnings":[], 'xp':0, "level":0, "descricao":"Use .descricao para alterar a sua descrição"})
             except:
                 pass
     #===================================================
@@ -83,7 +83,6 @@ class Economiaperfil(commands.Cog):
                         await ctx.channel.send(embed = discord.Embed(description = f'Você não tem saldo suficiente para concluir está transação', color=0x1CFEFE))
                 else:
                     await ctx.channel.send('**Porquê você quer transferir um valor para você mesmo?\nInforme um membro válido da próxima vez!**')
-
             else:
                 await ctx.channel.send('**Como você vai trasnferir um valor negativo ou nulo?\nInforme um valor correto da próxima vez!**')
 
@@ -133,7 +132,7 @@ class Economiaperfil(commands.Cog):
         nivel = int((next_level / 100)-1)
         porcent = int ((xp/next_level)*100)
         saldo = conta.find_one({'_id':user.id})['saldo']
-        embed = discord.Embed(title =f"PERFIL DE {user.name}:", color = 0xb586ef)
+        embed = discord.Embed(title =f"PERFIL DE {user.name}:", color = 0x1CFEFE)
         embed.add_field(name = '📝 Nome', value = f'{user.mention}', inline = True)
         embed.add_field(name = '📝 Descrição', value = f'{user.mention}', inline = True)
         embed.add_field(name = '<a:ff_fogo_padrao:809486155815845898> XP', value = f'` {xp} XP `', inline = True)
