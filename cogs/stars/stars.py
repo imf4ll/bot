@@ -41,9 +41,9 @@ class Stars(commands.Cog):
         await self.criar_conta(id)
         stats = conta.find_one({'_id':id})['stars']
         if len(stats) == 0:
-            await ctx.send(discord.Embed(description=f'{member.mention} ainda não possui Stars.', color=0x1CFEFE))
+            await ctx.send(embed = discord.Embed(description=f'{member.mention} ainda não possui Stars.', color=0x1CFEFE))
             return
-        await ctx.send(discord.Embed(title = f'STARS DE {mention}', description=f"{mention} possui {len(stats)} Stars!\n Acesso nosso site para conferir todas as pessoas que foram ajudadas por este usuário (em breve...)", color=0x1CFEFE))
+        await ctx.send(embed = discord.Embed(title = f'STARS DE {mention}', description=f"{mention} possui {len(stats)} Stars!\n Acesso nosso site para conferir todas as pessoas que foram ajudadas por este usuário (em breve...)", color=0x1CFEFE))
 
     @commands.command()
     async def avaliar(self, ctx, member : discord.Member = None, desc : str = None):
@@ -51,10 +51,10 @@ class Stars(commands.Cog):
         await self.criar_conta(id)
         await self.criar_conta(member.id)
         if member == None or member.id == id:
-            await ctx.send(discord.Embed(description='você precisa marcar um membro para dar uma Star', color=0xE63E43))
+            await ctx.send(embed = discord.Embed(description='você precisa marcar um membro para dar uma Star', color=0xE63E43))
             return
         if desc == None:
-            await ctx.send(discord.Embed(description='Você precisa definir uma descrição!', color=0xE63E43))
+            await ctx.send(embed = discord.Embed(description='Você precisa definir uma descrição!', color=0xE63E43))
             return
         data = datetime.datetime.now()
         if env == 'prod':
@@ -67,10 +67,10 @@ class Stars(commands.Cog):
                 already = True
                 break
         if already:
-            await ctx.send(discord.Embed(description='Você já deu uma Star para esse membro', color=0xE63E43))
+            await ctx.send(embed = discord.Embed(description='Você já deu uma Star para esse membro', color=0xE63E43))
             return
         conta.find_one_and_update({'_id':member.id}, {'$push':{'Stars':{'id':member.id, 'quant': 1, 'desc':desc, 'data':data}}})
-        await ctx.send(discord.Embed(description='Star enviada com sucesso!', color=0x1CFEFE))
+        await ctx.send(embed = discord.Embed(description='Star enviada com sucesso!', color=0x1CFEFE))
 
 
 
@@ -79,16 +79,16 @@ class Stars(commands.Cog):
         id = ctx.author.id
         await self.criar_conta(id)
         if member == None or member.id == id:
-            await ctx.send(discord.Embed(description='você precisa marcar um membro para remover a Star', color=0xE63E43))
+            await ctx.send(embed = discord.Embed(description='você precisa marcar um membro para remover a Star', color=0xE63E43))
             return
         if desc == None:
-            await ctx.send(discord.Embed(description='Você precisa definir uma descrição para filtrar!', color=0xE63E43))
+            await ctx.send(embed = discord.Embed(description='Você precisa definir uma descrição para filtrar!', color=0xE63E43))
             return
         try:
             conta.find_one_and_update({'_id':member.id}, {'$pull':{'Stars':{'desc':desc}}})
-            await ctx.send(discord.Embed(description='Star removida com sucesso!', color=0x1CFEFE))
+            await ctx.send(embed = discord.Embed(description='Star removida com sucesso!', color=0x1CFEFE))
         except:
-            await ctx.send(discord.Embed(description='Star não encontrada!', color=0xE63E43))
+            await ctx.send(embed = discord.Embed(description='Star não encontrada!', color=0xE63E43))
 
 
 
