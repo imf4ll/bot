@@ -1,6 +1,6 @@
 import discord
 from discord.ext import commands
-import requests as req
+from requests import get
 import datetime
 import asyncio
 from utils.mongoconnect import mongoConnect
@@ -12,24 +12,39 @@ conta = db['conta']
 server = db['server']
 membros = db['membros']
 
+cache_list_res = []
 def valor_acoes(code):
     if type(code) == str:
         url = f"https://api.binance.com/api/v3/ticker/24hr?symbol={code}"
-        res = req.request("GET", url).json()
-        return int(float(res['lastPrice']))
+        res = get(url).json()
+
+        if 'lastPrice' in res:
+            return int(float(res['lastPrice']))
+        
+        else:
+            return int(float(cache_list_res[code]['lastPrice']))
+
     else:
         list_res = []
         for i in code:
             url = f"https://api.binance.com/api/v3/ticker/24hr?symbol={i}"
-            res = req.request("GET", url).json()
-            list_res.append(res)
+            res = get(url, timeout = (5, 10)).json()
+                        
+            if 'lastPrice' in res:
+                cache_list_res.append(res)
+                list_res.append(res)
+
+            else:
+                for i in cache_list_res:
+                    list_res.append(i)
+            
         list_cryptos = {}
         for i in list_res:
-            print(i)
             list_cryptos[str(i['symbol'])] = [
                 int(float(i['lastPrice'])),
                 "{:.2f}".format(float(i['priceChangePercent']))
                 ]
+        
         return list_cryptos
 
 cryptos = {'BTC':'BTCBRL', 'ETH':'ETHBRL', 'BNB':'BNBBRL', 'LTC':'LTCBRL', 'AXS':'AXSBRL', 'SOL':'SOLBRL', 'DOT':'DOTBRL', 'LINK':'LINKBRL', 'CAKE':'CAKEBRL'}
@@ -66,29 +81,32 @@ class Crypto(commands.Cog):
         id = ctx.author.id
         await self.criar_conta(id)
         msg = await ctx.send('Coletando dados das criptomoedas...')
-        await asyncio.sleep(1)
-        await msg.delete()
 
         saldo = conta.find_one({'_id':id})['saldo']
 
-        embed=discord.Embed(title='EXCHANGE・Invista em Cripto Agora!', description='Utilize o comando `.comprar` para Comprar e `.vender` para Vender.\nEx: `.comprar/vender <crypto> <quantidade> <preço>`.\n⠀', color=0xB588EC)  
+        embed = discord.Embed(title='EXCHANGE・Invista em Cripto Agora!', description='Utilize o comando `.comprar` para Comprar e `.vender` para Vender.\nEx: `.comprar/vender <crypto> <quantidade> <preço>`.\n⠀', color=0xB588EC)  
         
         graficos = 'https://coinmarketcap.com/pt-br/currencies/bitcoin/ https://coinmarketcap.com/pt-br/currencies/ethereum/ https://coinmarketcap.com/pt-br/currencies/binance-coin/ https://coinmarketcap.com/pt-br/currencies/litecoin/ https://coinmarketcap.com/pt-br/currencies/axie-infinity/ https://coinmarketcap.com/pt-br/currencies/solana/ https://coinmarketcap.com/pt-br/currencies/polkadot-new/ https://coinmarketcap.com/pt-br/currencies/chainlink/ https://coinmarketcap.com/pt-br/currencies/pancakeswap/'.split()
         emojis_logos = ['<:binancecoin:926324388725424138>', '<:ethereum:926324233523560478>', '<:binancecoin:926324388725424138>', '<:litecoin:926324504156852224>', '<:axye:926324690916618260>', '<:solano:926324887407194132>', '<:polkadot:926324993569226782>', '<:chainlink:926325188969246730>', '<:pancakeswap:926325842236305468>']
+        
         codes = []
-        for i in cryptos_inverso:codes.append(i)
+        for i in cryptos_inverso: codes.append(i)
         crypto_json = valor_acoes(codes)
+        
         counter = 0
         for i in cryptos:
-            counter +=1
+            counter += 1
             valor = crypto_json[cryptos[i]][0]
             porce = crypto_json[cryptos[i]][1]
             porcentagem = f"```diff\n+{porce}%```" if not '-' in porce else f"```diff\n{porce}%```"
 
-            embed.add_field(name = f"{emojis_logos[counter - 1]} {str(cryptos_nome[i].capitalize())} ({i})", value = f"Price: `{valor}` R$・[Gráfico]({graficos[counter - 1]}){porcentagem}⠀", inline=True)
+            embed.add_field(name = f"{emojis_logos[counter - 1]} {str(cryptos_nome[i].capitalize())} ({i})", value = f"Preço: R$ `{valor}`・[Gráfico]({graficos[counter - 1]}){porcentagem}⠀", inline=True)
         
         embed.set_footer(text='⚠️ Atenção: Para a comprar e vender criptomoedas corretamente, utilize o código localizado após o nome da cripto.\n\n💡 Dica: Compre Criptos quando estiverem em baixa para vende-las quando estiverem em alta! Mas Cuidado! Nem sempre é assim.')
-        await ctx.send(embed=embed)
+        
+        await msg.delete()
+        await ctx.send(embed = embed)
+
 
     @commands.cooldown(1, 2, commands.BucketType.user)
     @commands.command()
