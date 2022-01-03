@@ -12,11 +12,11 @@ conta = db['conta']
 server = db['server']
 membros = db['membros']
 
-cache_list_res = []
 def valor_acoes(code):
+    cache_list_res = []
+
     if type(code) == str:
-        url = f"https://api.binance.com/api/v3/ticker/24hr?symbol={code}"
-        res = get(url).json()
+        res = get(f"https://api.binance.com/api/v3/ticker/24hr?symbol={code}").json()
 
         if 'lastPrice' in res:
             return int(float(res['lastPrice']))
@@ -27,23 +27,22 @@ def valor_acoes(code):
     else:
         list_res = []
         for i in code:
-            url = f"https://api.binance.com/api/v3/ticker/24hr?symbol={i}"
-            res = get(url, timeout = (5, 10)).json()
+            res = get(f"https://api.binance.com/api/v3/ticker/24hr?symbol={i}").json()
                         
             if 'lastPrice' in res:
-                cache_list_res.append(res)
                 list_res.append(res)
+        
+        if len(list_res) != 0:
+            cache_list_res = []
+            for i in list_res:
+                cache_list_res.append(i)
 
-            else:
-                for i in cache_list_res:
-                    list_res.append(i)
-            
         list_cryptos = {}
-        for i in list_res:
+        for i in cache_list_res:
             list_cryptos[str(i['symbol'])] = [
                 int(float(i['lastPrice'])),
                 "{:.2f}".format(float(i['priceChangePercent']))
-                ]
+            ]
         
         return list_cryptos
 
